@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Игра в кальмара — правила состава | MineBlaze</title>
+<meta name="description" content="Правила и обязанности состава на ивенте «Игра в кальмара»: круги, треугольники и менеджеры. Порядок санкций по правилам проекта MineBlaze.">
+<style>
+  :root{
+    --bg:#0a0a0c;
+    --panel:#121216;
+    --panel-2:#17171d;
+    --line:#26262f;
+    --pink:#e6007e;
+    --pink-soft:#ff3fa4;
+    --text:#ededf2;
+    --muted:#9a9aa8;
+    --ok:#25d07a;
+    --warn:#ffc247;
+    --danger:#ff4d5e;
+    --radius:16px;
+    --max:1120px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1100px 600px at 80% -10%, rgba(230,0,126,.18), transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, rgba(120,0,80,.16), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--pink-soft);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 22px}
+
+  header.top{
+    position:sticky;top:0;z-index:20;
+    backdrop-filter:blur(10px);
+    background:rgba(10,10,12,.78);
+    border-bottom:1px solid var(--line);
+  }
+  .top-inner{display:flex;align-items:center;gap:18px;height:64px;max-width:var(--max);margin:0 auto;padding:0 22px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.14em;font-size:13px;text-transform:uppercase}
+  .brand svg{width:26px;height:26px;flex:0 0 auto}
+  nav.links{margin-left:auto;display:flex;gap:18px;flex-wrap:wrap}
+  nav.links a{font-size:13px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+  nav.links a:hover{color:var(--text);text-decoration:none}
+
+  .hero{padding:66px 0 40px;border-bottom:1px solid var(--line)}
+  .kicker{color:var(--pink-soft);letter-spacing:.28em;text-transform:uppercase;font-size:11px;font-weight:700;margin-bottom:18px}
+  h1{margin:0 0 18px;font-size:clamp(32px,5.6vw,62px);line-height:1.02;letter-spacing:-.02em;font-weight:800}
+  h1 span{color:var(--pink-soft)}
+  .lead{max-width:70ch;color:var(--muted);font-size:clamp(15px,1.5vw,18px);margin:0}
+  .meta{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+  .chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:8px 14px;font-size:13px;color:var(--muted)}
+  .chip b{color:var(--text);font-weight:600}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--pink);box-shadow:0 0 12px var(--pink)}
+
+  section{padding:56px 0}
+  section + section{border-top:1px solid var(--line)}
+  h2{margin:0 0 8px;font-size:clamp(22px,3vw,32px);letter-spacing:-.01em}
+  .sub{color:var(--muted);margin:0 0 28px;max-width:78ch}
+
+  /* role tabs */
+  .tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px}
+  .tab{
+    appearance:none;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--muted);
+    border-radius:12px;padding:12px 18px;font-size:14px;font-weight:600;letter-spacing:.02em;
+    display:inline-flex;align-items:center;gap:10px;transition:.16s ease;
+  }
+  .tab:hover{border-color:#3a3a48;color:var(--text)}
+  .tab[aria-selected="true"]{background:linear-gradient(180deg,rgba(230,0,126,.22),rgba(230,0,126,.08));border-color:var(--pink);color:#fff}
+  .tab svg{width:20px;height:20px}
+  .tab:focus-visible{outline:2px solid var(--pink-soft);outline-offset:2px}
+
+  .panel{display:none;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:26px;animation:fade .18s ease}
+  .panel.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .panel h3{margin:0 0 4px;font-size:20px}
+  .panel .role-tag{color:var(--pink-soft);font-size:12px;letter-spacing:.22em;text-transform:uppercase;font-weight:700}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:18px}
+  @media (max-width:760px){.cols{grid-template-columns:1fr}}
+  .list{margin:0;padding:0;list-style:none}
+  .list li{position:relative;padding-left:22px;margin-bottom:10px;color:#d5d5de;font-size:15px}
+  .list li::before{content:"";position:absolute;left:0;top:.62em;width:8px;height:8px;border:2px solid var(--pink);border-radius:50%}
+  .list.deny li::before{border-color:var(--danger);border-radius:2px;transform:rotate(45deg)}
+  .col-title{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
+
+  /* universal rules */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media (max-width:900px){.grid{grid-template-columns:1fr 1fr}}
+  @media (max-width:620px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px;position:relative;overflow:hidden}
+  .card::after{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:linear-gradient(180deg,var(--pink),transparent)}
+  .card .num{font-size:12px;letter-spacing:.2em;color:var(--pink-soft);font-weight:700}
+  .card h4{margin:8px 0 8px;font-size:17px}
+  .card p{margin:0;color:var(--muted);font-size:14.5px}
+
+  /* escalation */
+  .steps{display:grid;gap:12px;counter-reset:step}
+  .step{display:grid;grid-template-columns:44px 1fr auto;gap:16px;align-items:start;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+  .step .badge{width:34px;height:34px;border-radius:50%;border:1px solid var(--pink);display:grid;place-items:center;font-weight:700;font-size:14px;color:var(--pink-soft)}
+  .step h4{margin:0 0 4px;font-size:16px}
+  .step p{margin:0;color:var(--muted);font-size:14.5px}
+  .tag{font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:5px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+  .tag.warn{color:var(--warn);border-color:rgba(255,194,71,.4)}
+  .tag.danger{color:var(--danger);border-color:rgba(255,77,94,.4)}
+  .tag.ok{color:var(--ok);border-color:rgba(37,208,122,.4)}
+  @media (max-width:640px){.step{grid-template-columns:36px 1fr}.step .tag{grid-column:2;justify-self:start}}
+
+  table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  th,td{padding:14px 16px;text-align:left;font-size:14.5px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);background:var(--panel-2)}
+  tr:last-child td{border-bottom:0}
+  td b{color:#fff}
+  .table-scroll{overflow-x:auto}
+
+  .note{border-left:3px solid var(--pink);background:linear-gradient(90deg,rgba(230,0,126,.12),transparent 70%);padding:16px 20px;border-radius:0 12px 12px 0;color:#d9d9e2;font-size:14.5px}
+
+  footer{border-top:1px solid var(--line);padding:34px 0 54px;color:var(--muted);font-size:13.5px}
+  .foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+  .sig{display:flex;gap:10px;align-items:center;letter-spacing:.16em;text-transform:uppercase;font-size:11px}
+  .sig svg{width:18px;height:18px}
+
+  .print-hint{font-size:12.5px;color:var(--muted);margin-top:14px}
+  @media print{
+    body{background:#fff;color:#111}
+    header.top,nav.links{position:static;background:none;border:0}
+    .card,.panel,.step,table{background:#fff;border-color:#ccc}
+    .lead,.sub,.card p,.step p,td{color:#333}
+    section + section{border-color:#ddd}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <svg viewBox="0 0 40 40" aria-hidden="true">
+        <circle cx="20" cy="20" r="18" fill="none" stroke="#e6007e" stroke-width="2"/>
+        <circle cx="20" cy="20" r="7" fill="#e6007e"/>
+      </svg>
+      <span>Игра в кальмара · состав</span>
+    </div>
+    <nav class="links" aria-label="Навигация">
+      <a href="#roles">Роли</a>
+      <a href="#rules">Правила</a>
+      <a href="#protocol">Нарушения</a>
+      <a href="#sanctions">Санкции</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="wrap">
+      <div class="kicker">MineBlaze · Портал Эпсилон (s1)</div>
+      <h1>Правила состава<br>на <span>«Игре в кальмара»</span></h1>
+      <p class="lead">
+        Этот документ — для кругов, треугольников и менеджеров. Здесь роли, запреты и порядок
+        действий при нарушении, чтобы раунды шли одинаково у всех и без самодеятельности.
+      </p>
+      <div class="meta">
+        <span class="chip"><span class="dot"></span> Старт: <b>25 октября, 13:00 МСК</b></span>
+        <span class="chip">Локация: <b>/s1 · Эпсилон</b></span>
+        <span class="chip">Приз: <b>донат «ГлАдмин»</b></span>
+      </div>
+    </div>
+  </div>
+
+  <section id="roles">
+    <div class="wrap">
+      <h2>Три роли — три маски</h2>
+      <p class="sub">Маска определяет, что участник делает и что ему запрещено. Никто не выходит за рамки своей роли — даже если «так быстрее».</p>
+
+      <div class="tabs" role="tablist" aria-label="Роли состава">
+        <button class="tab" role="tab" id="tab-circle" aria-controls="panel-circle" aria-selected="true">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+          Круг
+        </button>
+        <button class="tab" role="tab" id="tab-triangle" aria-controls="panel-triangle" aria-selected="false" tabindex="-1">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 21 20H3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+          Треугольник
+        </button>
+        <button class="tab" role="tab" id="tab-square" aria-controls="panel-square" aria-selected="false" tabindex="-1">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+          Менеджер
+        </button>
+      </div>
+
+      <div class="panel on" id="panel-circle" role="tabpanel" aria-labelledby="tab-circle">
+        <div class="role-tag">○ Круг · рабочий</div>
+        <h3>Обслуживание арены</h3>
+        <div class="cols">
+          <div>
+            <p class="col-title">Что делает</p>
+            <ul class="list">
+              <li>Готовит реквизит раунда и убирает арену между этапами.</li>
+              <li>Сопровождает игроков по коридорам по сигналу треугольника.</li>
+              <li>Следит за порядком в своей зоне и докладывает менеджеру.</li>
+              <li>Выполняет только то, что поручил менеджер или треугольник.</li>
+            </ul>
+          </div>
+          <div>
+            <p class="col-title">Что запрещено</p>
+            <ul class="list deny">
+              <li>Снимать маску и показывать лицо.</li>
+              <li>Говорить с игроками или между собой без разрешения.</li>
+              <li>Покидать закреплённую комнату или зону.</li>
+              <li>Самостоятельно наказывать игроков — это делает треугольник.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="panel-triangle" role="tabpanel" aria-labelledby="tab-triangle" hidden>
+        <div class="role-tag">△ Треугольник · охрана</div>
+        <h3>Контроль игроков</h3>
+        <div class="cols">
+          <div>
+            <p class="col-title">Что делает</p>
+            <ul class="list">
+              <li>Держит очередь и проверяет игроков перед входом на арену.</li>
+              <li>Первым выносит устное предупреждение за нарушение.</li>
+              <li>Фиксирует нарушение: ник, время, что произошло.</li>
+              <li>Докладывает менеджеру и выполняет его решение о санкции.</li>
+            </ul>
+          </div>
+          <div>
+            <p class="col-title">Что запрещено</p>
+            <ul class="list deny">
+              <li>Снимать маску и показывать лицо.</li>
+              <li>Говорить без разрешения менеджера.</li>
+              <li>Покидать пост и комнату без разрешения.</li>
+              <li>Бить, оскорблять игрока или выдавать бан без решения менеджера.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="panel-square" role="tabpanel" aria-labelledby="tab-square" hidden>
+        <div class="role-tag">□ Менеджер · управляющий</div>
+        <h3>Управление раундом</h3>
+        <div class="cols">
+          <div>
+            <p class="col-title">Что делает</p>
+            <ul class="list">
+              <li>Объявляет правила раунда, тайминги и условия выхода.</li>
+              <li>Разрешает или запрещает речь кругам и треугольникам.</li>
+              <li>Принимает решение о санкции и фиксирует его в логе.</li>
+              <li>Связывается с администрацией MineBlaze в спорных случаях.</li>
+            </ul>
+          </div>
+          <div>
+            <p class="col-title">Что запрещено</p>
+            <ul class="list deny">
+              <li>Снимать маску и показывать лицо.</li>
+              <li>Менять правила раунда посреди раунда без объявления.</li>
+              <li>Оставлять арену без замещающего менеджера.</li>
+              <li>Решать конфликт «по дружбе» в обход правил проекта.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="rules">
+    <div class="wrap">
+      <h2>Общие правила для всех</h2>
+      <p class="sub">Действуют на всей площадке — от лобби до комнат отдыха — и не зависят от роли и стажа.</p>
+      <div class="grid">
+        <div class="card">
+          <div class="num">01</div>
+          <h4>Маску не снимать</h4>
+          <p>Маска остаётся на лице всё мероприятие. Снял — нарушение, дальше по порядку санкций.</p>
+        </div>
+        <div class="card">
+          <div class="num">02</div>
+          <h4>Не говорить без разрешения</h4>
+          <p>Речь — только по команде менеджера. Вне раунда общение внутри состава — тоже с его разрешения.</p>
+        </div>
+        <div class="card">
+          <div class="num">03</div>
+          <h4>Не покидать комнату</h4>
+          <p>Вышел из закреплённой комнаты или зоны без разрешения — устное предупреждение, затем санкция.</p>
+        </div>
+        <div class="card">
+          <div class="num">04</div>
+          <h4>Не мешать игрокам</h4>
+          <p>Подсказки, споры, физическое вмешательство в ход раунда запрещены: это помеха игре.</p>
+        </div>
+        <div class="card">
+          <div class="num">05</div>
+          <h4>Нейтралитет</h4>
+          <p>Никаких симпатий и ставок: состав не помогает ни одному игроку и не сливает информацию.</p>
+        </div>
+        <div class="card">
+          <div class="num">06</div>
+          <h4>Правила проекта выше</h4>
+          <p>Общие правила MineBlaze действуют всегда. Ивент их не отменяет и не смягчает.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="protocol">
+    <div class="wrap">
+      <h2>Если игрок мешает</h2>
+      <p class="sub">Порядок один для всех: сначала предупреждение, только потом санкция. Пропускать шаги нельзя — это самодеятельность.</p>
+      <div class="steps">
+        <div class="step">
+          <div class="badge">1</div>
+          <div>
+            <h4>Устное предупреждение</h4>
+            <p>Треугольник спокойно и чётко говорит игроку, что именно он нарушил и что делать дальше. Один раз, без крика и угроз.</p>
+          </div>
+          <span class="tag ok">обязательно</span>
+        </div>
+        <div class="step">
+          <div class="badge">2</div>
+          <div>
+            <h4>Фиксация</h4>
+            <p>Ник, время и суть нарушения записываются в лог ивента. Менеджер видит запись до принятия решения.</p>
+          </div>
+          <span class="tag">лог</span>
+        </div>
+        <div class="step">
+          <div class="badge">3</div>
+          <div>
+            <h4>Повторное нарушение</h4>
+            <p>Если игрок продолжает мешать — менеджер применяет санкцию по правилам проекта MineBlaze: мут, кик с арены или бан.</p>
+          </div>
+          <span class="tag warn">по правилам проекта</span>
+        </div>
+        <div class="step">
+          <div class="badge">4</div>
+          <div>
+            <h4>Спор или жалоба</h4>
+            <p>Менеджер останавливает раунд и передаёт разбор администрации MineBlaze. Состав не спорит с игроком публично.</p>
+          </div>
+          <span class="tag danger">администрация</span>
+        </div>
+      </div>
+      <p class="print-hint">Предупреждение — не наказание. Наказание назначает только менеджер, по правилам проекта.</p>
+    </div>
+  </section>
+
+  <section id="sanctions">
+    <div class="wrap">
+      <h2>Санкции по шагам</h2>
+      <p class="sub">Шкала применяется последовательно. Тяжёлые нарушения (оскорбления, вред игрокам, слив информации) идут сразу к менеджеру и администрации.</p>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th>Шаг</th><th>Нарушение</th><th>Кто применяет</th><th>Действие</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><b>1</b></td><td>Снял маску, заговорил, вышел из комнаты, подсказал игроку</td><td>Треугольник</td><td>Устное предупреждение + запись в лог</td></tr>
+            <tr><td><b>2</b></td><td>Повторил нарушение или мешает раунду</td><td>Менеджер</td><td>Мут в чате на время раунда</td></tr>
+            <tr><td><b>3</b></td><td>Продолжает мешать, срывает этап</td><td>Менеджер</td><td>Кик с арены, замена из резерва</td></tr>
+            <tr><td><b>4</b></td><td>Оскорбления, вред игрокам, слив информации, снятая маска на публику</td><td>Менеджер + администрация</td><td>Бан по правилам проекта MineBlaze</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note" style="margin-top:22px">
+        Спорные ситуации решает менеджер, а не толпа в чате. Если решение менеджера оспаривают — раунд ставится на паузу и вопрос уходит администрации MineBlaze.
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap foot">
+      <div class="sig">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" fill="none" stroke="#e6007e" stroke-width="2"/></svg>
+        <span>Игра в кальмара · 25.10 · 13:00 МСК · /s1 Эпсилон</span>
+      </div>
+      <div>Документ для состава. Общие правила проекта — MineBlaze.</div>
+    </div>
+  </footer>
+</main>
+
+<script>
+(function () {
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+
+  function select(tab) {
+    tabs.forEach(function (t) {
+      var panel = document.getElementById(t.getAttribute('aria-controls'));
+      var on = t === tab;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      if (panel) {
+        panel.classList.toggle('on', on);
+        if (on) {
+          panel.removeAttribute('hidden');
+        } else {
+          panel.setAttribute('hidden', '');
+        }
+      }
+    });
+  }
+
+  tabs.forEach(function (tab, i) {
+    tab.addEventListener('click', function () {
+      select(tab);
+    });
+    tab.addEventListener('keydown', function (e) {
+      var dir = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!dir) return;
+      e.preventDefault();
+      var next = tabs[(i + dir + tabs.length) % tabs.length];
+      next.focus();
+      select(next);
+    });
+  });
+})();
+</script>
+</body>
+</html>
